@@ -47,8 +47,8 @@
         <br>
         <div class="card mb-3">
                 <div class="card-header" id="cardHeader">Add Train</div>
-                <p>Directions: Please fill out all fields.</p>
-                <div class="card-body">
+                <p>Directions: Click on the row to delete or edit information.</p>
+                <div class="card-body" id="search">
                         <form>
                                 <div class="form-group row">
                                   <label for="train-name">Train Name</label>
@@ -60,13 +60,16 @@
                                 </div>
                                 <div class="form-group row">
                                         <label for="train-firstTime">First Train Time(HH:mm-military time)</label>
-                                        <input class="form-control" id="train-firstTime" type="text" placeholder="00:00 - 23:59">
+                                        <input class="form-control" id="train-firstTime" type="time" placeholder="00:00 - 23:59">
                                 </div>  
                                 <div class="form-group row">
                                         <label for="train-frequency">Frequency</label>
                                         <input class="form-control" id="train-frequency" type="number" placeholder="Frequency Of Train" >
                                 </div> 
                                 <button class="btn" id="addTrain" type="submit">Add Train</button>
+                                <button class="btn" id="editTrain" type="submit">Save</button>
+                                <br>
+                                <button class="btn" id="deleteTrain" type="submit">Delete</button>    
                               </form>
                 </div>
         </div>

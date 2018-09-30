@@ -20,6 +20,6 @@ tr:hover{
     background-image: url("../images/trainTrack.jpg");
 }
 
-#addTrain{
+#addTrain,#editTrain,#deleteTrain{
     background-color: rgb(76, 106, 107);
 }

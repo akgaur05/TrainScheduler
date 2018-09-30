@@ -114,6 +114,52 @@ function displayTime(timeArray) {
     }
 }
 
+function findArrayID() {
+    // Find the train in the array
+    for (arrayID = 0; arrayID < trains.length; arrayID++) {
+        if (trains[arrayID].id === trainID) {
+            myTrain = trains[arrayID];
+
+            break;
+        }
+    }
+}
+
+
+function switchMode(mode) {
+    if (mode === "add") {
+        // Reset the fields
+        $("input").val("");
+        
+        // Change to add mode
+        $("#search > h2").text("Add a Train");
+        $("#addTrain").css({"display": "block"});
+        $("#deleteTrain").css({"display": "none"});
+        $("#editTrain").css({"display": "none"});
+
+    } else if (mode === "edit") {
+        // Format the departure time
+        const h = myTrain.departure[1];
+        const m = myTrain.departure[2];
+
+        let departure_string = (h < 10) ? `0${h}` : h;
+        departure_string += (m < 10) ? `:0${m}` : `:${m}`;
+
+        // Update the fields
+        $("#train-name").val(myTrain.name);
+        $("#train-destination").val(myTrain.destination);
+        $("#train-firstTime").val(departure_string);
+        $("#train-frequency").val(myTrain.frequency);
+
+        // Change to edit mode
+        $("#search > h2").text("Delete or Edit the Train");
+        $("#addTrain").css({"display": "none"});
+        $("#deleteTrain, #editTrain").css({"display": "block"});
+
+    }
+}
+
+
 function addTrain(){
     const departure_string = $("#train-firstTime").val().trim();
     [h, m] = departure_string.split(":").map(x => parseInt(x, 10));
@@ -132,7 +178,67 @@ function addTrain(){
     $("input").val("");
 }
 
+function editTrain() {
+    // Format the departure time
+    const departure_string = $("#train-firstTime").val().trim();
+
+    // Extract hour and minute
+    [h, m] = departure_string.split(":").map(x => parseInt(x, 10));
+
+    // Update the database
+    const train = {
+        "id"         : trainID,
+        "name"       : $("#train-name").val().trim(),
+        "destination": $("#train-destination").val().trim(),
+        "departure"  : [0, h, m],
+        "frequency"  : parseInt($("#train-frequency").val().trim())
+    };
+    
+    database.ref().child(trainID).update(train);
+
+    // Reset
+    switchMode("add");
+}
+
+function deleteTrain() {
+    // Update the database
+    database.ref().child(trainID).remove();
+
+    // Reset
+    switchMode("add");
+}
+
+
+function refreshSchedule() {
+    let output = "";
+
+    trains.forEach(train => output += displayTrain(train));
+
+    $("tbody").empty().append(output);
+}
+
+
 $(document).ready(function() {
     loadDatabase();
+    switchMode("add");
+    // Refresh the schedule every minute
+    const numSecondsLeft = 60 - (new Date()).getSeconds();
+
+    setTimeout(function() {
+        refreshSchedule();
+
+        setInterval(refreshSchedule, 60000);
+
+    }, 1000 * numSecondsLeft);
+
     $("#addTrain").on("click", addTrain);
+    $("#editTrain").on("click", editTrain);
+    $("#deleteTrain").on("click", deleteTrain);
+});
+
+// Listen to clicks on dynamic elements
+$("body").on("click", "tr", function() {
+    trainID = parseInt($(this).attr("id"));
+    findArrayID(); 
+    switchMode("edit");
 });
